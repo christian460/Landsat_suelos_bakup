@@ -1,0 +1,69 @@
+import streamlit as st
+from Core.gee_init import inicializar_gee, obtener_zona_estudio
+ 
+st.set_page_config(
+    page_title="Análisis de degradación de suelos – Uchumayo",
+    layout="wide",
+)
+ 
+# ── Inicializar GEE ──────────────────────────────────────────────────────────
+try:
+    inicializar_gee()
+except Exception as e:
+    st.error(f"Error al inicializar Google Earth Engine: {str(e)}")
+    st.info("Verifica tus credenciales de GEE en las variables de entorno.")
+    st.stop()
+ 
+# ── Cargar zona de estudio una sola vez ──────────────────────────────────────
+if "zona_estudio" not in st.session_state:
+    try:
+        st.session_state["zona_estudio"] = obtener_zona_estudio()
+    except Exception as e:
+        st.error(f"Error al cargar la zona de estudio: {str(e)}")
+        st.info("Verifica que el asset 'projects/fourth-return-458106-r5/assets/uchumayo' exista.")
+        st.stop()
+ 
+# ── Página de inicio ─────────────────────────────────────────────────────────
+st.title("Aplicación para el análisis de la degradación de suelos")
+ 
+st.markdown("""
+## Bienvenido al Sistema de Análisis Multitemporal
+ 
+Este sistema permite analizar la degradación de suelos debido a las emisiones
+del parque automotor en el sector de **Uchumayo – Arequipa**, usando tecnología
+satelital georreferencial.
+ 
+## Funcionalidades disponibles
+ 
+**Exploración Espacial**
+- Visualiza índices espectrales de un año específico
+- Explora diferentes índices de vegetación y agua
+- Ajusta la opacidad de las capas
+ 
+**Análisis Multitemporal**
+- Compara 3 años diferentes simultáneamente
+- Visualiza series temporales (2000–2025)
+- Analiza anomalías y tendencias
+- Estadísticas por periodo
+ 
+## Índices disponibles
+| Índice | Descripción |
+|--------|-------------|
+| **NDVI**  | Índice de Vegetación Normalizado |
+| **SAVI**  | Índice de Vegetación Ajustado al Suelo |
+| **EVI**   | Índice de Vegetación Mejorado |
+| **GNDVI** | Índice Verde Normalizado |
+| **LSWI**  | Índice de Agua en Onda Corta |
+| **NDWI**  | Índice de Agua Normalizado |
+| **MNDWI** | Índice de Agua Modificado |
+ 
+---
+""")
+ 
+col1, col2 = st.columns(2)
+with col1:
+    st.success("✅ Zona de estudio cargada correctamente")
+    st.info("📍 **Área de estudio:** Uchumayo – Arequipa")
+with col2:
+    st.info("📅 **Período disponible:** 2000 – 2025")
+    st.info("🛰️ **Satélites:** Landsat 7 (2000–2011) · Landsat 8 (2013–2025)")
